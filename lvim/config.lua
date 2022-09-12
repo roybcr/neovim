@@ -20,7 +20,6 @@ vim.g.tokyonight_style = "storm" -- storm | night | light
 vim.g.tokyonight_italic_functions = false
 vim.g.tokyonight_italic_keywords = false
 vim.g.tokyonight_sidebars = { "qf", "vista_kind", "terminal", "packer" }
-vim.g.tokyonight_colors = { hint = "orange", error = "#ff0000" }
 
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
@@ -78,6 +77,31 @@ lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
 lvim.builtin.nvimtree.setup.view.width = 40
 lvim.builtin.nvimtree.setup.renderer.icons.show.folder = false
 
+-- LuaLine Config
+
+-- "ayu"   | "ayu_light"  | "ayu_dark" | "everforest"      | "iceberg_light"    | "base16" | "ayu_mirage" |"material" | "nightfly" |
+-- "nord" | "OceanicNext" | "onedark"  | "papercolor_dark" | "papercolor_light" | "powerline" | "solarized_dark" | "Tomorrow" | "seoul256"
+lvim.builtin.lualine.options.theme = "onedark"
+lvim.builtin.lualine.options.component_separators = { left = '', right = '' }
+lvim.builtin.lualine.options.section_separators = { left = '', right = '' }
+lvim.builtin.lualine.options.disabled_filetypes = {
+  statusline = {},
+  winbar = {},
+}
+lvim.builtin.lualine.options.ignore_focus = {}
+lvim.builtin.lualine.options.refresh = {
+  statusline = 1000,
+  tabline = 1000,
+  winbar = 1000,
+}
+lvim.builtin.lualine.sections = {
+  lualine_a = { "mode" },
+  lualine_b = { 'branch', 'diff', 'diagnostics' },
+  lualine_c = { 'filename' },
+  lualine_x = { 'fileformat', 'filetype' },
+  lualine_y = { 'progress' },
+  lualine_z = { 'location' }
+}
 
 -- if you don't want all the parsers change this to a table of the ones you want
 
@@ -100,7 +124,24 @@ lvim.builtin.treesitter.ensure_installed = {
 lvim.builtin.treesitter.ignore_install = { "haskell", "eslint" }
 lvim.builtin.treesitter.highlight.enabled = true
 lvim.builtin.treesitter.rainbow.enable = true
-
+lvim.builtin.treesitter.playground = {
+  enable = true,
+  disable = {},
+  updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+  persist_queries = false, -- Whether the query persists across vim sessions
+  keybindings = {
+    toggle_query_editor = 'o',
+    toggle_hl_groups = 'i',
+    toggle_injected_languages = 't',
+    toggle_anonymous_nodes = 'a',
+    toggle_language_display = 'I',
+    focus_language = 'f',
+    unfocus_language = 'F',
+    update = 'R',
+    goto_node = '<cr>',
+    show_help = '?',
+  },
+}
 -- generic LSP settings
 
 -- -- make sure server will always be installed even if the server is in skipped_servers list
@@ -158,6 +199,22 @@ lvim.lsp.installer.setup.ui.border = "rounded"
 --   },
 -- }
 
+local formatters = require "lvim.lsp.null-ls.formatters"
+
+formatters.setup {
+  { command = "prettier",
+    extra_args = {
+      "--print-width", "100",
+      "--tab-width", "4",
+      "--semi", "true",
+      "--single-quotes", "true",
+      "--trailing-comma", "all"
+    },
+    filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" }
+  }
+}
+
+
 -- -- set additional linters
 -- local linters = require "lvim.lsp.null-ls.linters"
 -- linters.setup {
@@ -179,11 +236,65 @@ lvim.lsp.installer.setup.ui.border = "rounded"
 --  Additional Plugins
 lvim.plugins = {
   { "folke/tokyonight.nvim" },
+  { "lunarvim/colorschemes" },
   {
     "folke/trouble.nvim",
     cmd = "TroubleToggle",
   },
+  { "nvim-treesitter/playground",
+    event = "BufRead",
+  },
+  {
+    "folke/lsp-colors.nvim",
+    event = "BufRead",
+  },
+  {
+    -- Copilot
+    "zbirenbaum/copilot.lua",
+    event = { "VimEnter" },
+    config = function()
+      vim.defer_fn(function()
+        require("copilot").setup {
+          plugin_manager_path = get_runtime_dir() .. "/site/pack/packer",
+        }
+      end, 100)
+    end,
+  },
+  {
+    -- Copilot
+    "zbirenbaum/copilot-cmp",
+    module = "copilot_cmp",
+    after = { "copilot.lua", "nvim-cmp" },
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    requires = { "kyazdani42/nvim-web-devicons", opt = true },
+  },
 }
+
+-- Copilot
+lvim.builtin.cmp.formatting.source_names["copilot"] = "(Copilot)"
+table.insert(lvim.builtin.cmp.sources, 1, { name = "copilot" })
+--
+--
+-- local has_words_before = function()
+-- if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+-- local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+-- return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
+-- end
+--
+-- cmp.setup({
+-- mapping = {
+-- ["<Tab>"] = vim.schedule_wrap(function(fallback)
+-- if cmp.visible() and has_words_before() then
+-- cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+-- else
+-- fallback()
+-- end
+-- end),
+-- },
+-- })
+
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {

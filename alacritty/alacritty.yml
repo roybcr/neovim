@@ -62,13 +62,19 @@
   #     - transparent: Title bar, transparent background and title bar buttons
   #     - buttonless: Title bar, transparent background and no title bar buttons
   window:
-    decorations: none
+    decorations: full
     dynamic_title: true
-    multiplier: 10 
+    multiplier: 5 
     gtk_theme_variant: dark
+    startup_mode: Windowed 
     padding:
-      x: 12
-      y: 12
+      x: 0
+      y: 0
+    title: Jarvis λ
+    class: 
+      instance: Alacritty
+      general: Alacritty
+
   # Background opacity
   #
   # Window opacity as a floating point number from `0.0` to `1.0`.
@@ -112,11 +118,16 @@
 
 # Font configuration
   font: 
-    normal: 
-      family: "UbuntuMono NF"
-      style: Regular
+    normal:
+          # family: "NotoSansMono Nerd Font"
+          family: "SF Mono"
+          style: "Regular"
+    size: 10.0
+      # style: Regular
+      # family: "NotoSansMono Nerd Font"
+      # family: "FuraCode NF"
+      # family: "UbuntuMono NF"
   
-    size: 11.0
 #font:
   # Normal (roman) font face
   #normal:
@@ -199,7 +210,8 @@
 
   colors:
     primary:
-       background: '#24283b' # ===> matches Tokyonight "storm"
+      # background: '#1e222a' # ===> matches OneDark 
+      background: '#24283b' # ===> matches Tokyonight "storm"
       # background: '#1a1b26' # ===> matches Tokyonight "night"
 
 
@@ -228,7 +240,8 @@
   #cursor:
   #  text: CellBackground
   #  cursor: CellForeground
-
+    cursor:
+      cursor: "#ff0063"
   # Vi mode cursor colors
   #
   # Colors for the cursor when the vi mode is active.
@@ -400,6 +413,7 @@
     style:
       shape: Beam
       blinking: On
+      thickness: 0.10
 #cursor:
   # Cursor style
   #style:
@@ -764,11 +778,15 @@
 #
 # If the same trigger is assigned to multiple actions, all of them are executed
 # in the order they were defined in.
-#key_bindings:
-  #- { key: Paste,                                       action: Paste          }
-  #- { key: Copy,                                        action: Copy           }
+  key_bindings:
+    - { key: V, mods: Control|Shift, action: Paste }
+    - { key: C, mods: Control|Shift, action: Copy }
+    - { key: V, mods: Super, mode: ~Alt, action: ToggleViMode }
+    - { key: Escape, mode: Vi, action: ToggleViMode }
+    - { key: S, mods: Control|Shift, action: SearchForward }
+    - { key: B, mods: Control|Shift, action: SearchBackward }
   #- { key: L,         mods: Control,                    action: ClearLogNotice }
-  #- { key: L,         mods: Control, mode: ~Vi|~Search, chars: "\x0c"          }
+  #- { key: L, mods: Alt, mode: ~Vi|~Search, chars: "\x0c"              }
   #- { key: PageUp,    mods: Shift,   mode: ~Alt,        action: ScrollPageUp,  }
   #- { key: PageDown,  mods: Shift,   mode: ~Alt,        action: ScrollPageDown }
   #- { key: Home,      mods: Shift,   mode: ~Alt,        action: ScrollToTop,   }
